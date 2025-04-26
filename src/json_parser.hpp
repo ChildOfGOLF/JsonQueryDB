@@ -30,5 +30,6 @@ struct JsonArray {
 // Парсит JSON и возвращает  JsonValue
 JsonValue parseFromFile(const std::string& filename);
 // Можно добавить parseFromString
+JsonValue parseFromString(const std::string& json_str);
 
 #endif
