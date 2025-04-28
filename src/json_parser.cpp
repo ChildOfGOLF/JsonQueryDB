@@ -59,6 +59,42 @@ std::string parseString(JsonReader& reader) {
     return result;
 }
 
+double parseNumber(JsonReader& reader) {
+    std::string numberStr;
+
+    if (reader.peek() == '-') {
+        numberStr += reader.get();
+    }
+
+    while (std::isdigit(reader.peek())) {
+        numberStr += reader.get();
+    }
+
+    if (reader.peek() == '.') {
+        numberStr += reader.get();
+        if (!std::isdigit(reader.peek())) {
+            throw std::runtime_error("Ожидалась цифра после точки в числе");
+        }
+        while (std::isdigit(reader.peek())) {
+            numberStr += reader.get();
+        }
+    }
+
+    if (reader.peek() == 'e' || reader.peek() == 'E') {
+        numberStr += reader.get();
+
+        if (reader.peek() == '+' || reader.peek() == '-') {
+            numberStr += reader.get();
+        }
+
+        while (std::isdigit(reader.peek())) {
+            numberStr += reader.get();
+        }
+    }
+        return std::stod(numberStr);
+}
+
+
 namespace {
     JsonValue parseValue(JsonReader& reader) {
         reader.skipSpace();
@@ -71,7 +107,7 @@ namespace {
         } else if (ch == '"') {
             return parseString(reader);
         } else if (std::isdigit(ch)) {
-            //parseNumber
+            return parseNumber(reader);
         } else if (ch == 't' || ch == 'f' || ch == 'n') {
             // parseLiteral
         }
