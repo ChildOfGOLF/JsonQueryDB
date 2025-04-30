@@ -139,6 +139,8 @@ namespace {
         } else if (ch == 't' || ch == 'f' || ch == 'n') {
             return parseLiteral(reader);
         }
+
+        throw std::runtime_error(std::string("Неизвестный JSON токен: ") + ch);
     }
 }
 
