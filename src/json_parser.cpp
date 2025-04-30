@@ -94,6 +94,34 @@ double parseNumber(JsonReader& reader) {
         return std::stod(numberStr);
 }
 
+JsonValue parseLiteral(JsonReader& reader) {
+    if (reader.peek() == 't') {
+        if (reader.get() == 't' &&
+            reader.get() == 'r' &&
+            reader.get() == 'u' &&
+            reader.get() == 'e') {
+                return true;
+            }
+    } else if (reader.peek() == 'f') {
+        if (reader.get() == 'f' &&
+            reader.get() == 'a' &&
+            reader.get() == 'l' &&
+            reader.get() == 's' &&
+            reader.get() == 'e') {
+                return false;
+            }
+    } else if (reader.peek() == 'n') {
+        if (reader.get() == 'n' &&
+            reader.get() == 'u' &&
+            reader.get() == 'l' &&
+            reader.get() == 'l') {
+                return nullptr;
+            }
+    }
+
+    throw std::runtime_error("Неизвестный литерал");
+}
+
 
 namespace {
     JsonValue parseValue(JsonReader& reader) {
@@ -109,7 +137,7 @@ namespace {
         } else if (std::isdigit(ch)) {
             return parseNumber(reader);
         } else if (ch == 't' || ch == 'f' || ch == 'n') {
-            // parseLiteral
+            return parseLiteral(reader);
         }
     }
 }
