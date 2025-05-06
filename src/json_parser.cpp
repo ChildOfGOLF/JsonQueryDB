@@ -29,6 +29,49 @@ namespace {
     };
 }
 
+JsonValue parseObject(JsonReader& reader) {
+    JsonObject obj;
+
+    if (reader.get() != '{') {
+        throw std::runtime_error("Объект должен начинаться с {");
+    }
+
+    reader.skipSpace();
+    if (reader.peek() == '}') {
+        reader.get();   // пустрой оъбект
+        return obj;
+    }
+
+    while (true) {
+        reader.skipSpace();
+        if (reader.peek() != '"') {
+            throw std::runtime_error("Ожидалась строка объкта");
+        }
+
+        std::string key = parseString(reader);
+        reader.skipSpace();
+
+        if (reader.get() != ':') {
+            throw std::runtime_error("Ожидался ':'");
+        }
+
+        reader.skipSpace();
+        JsonValue value = parseValue(reader);
+
+        obj.values[key] = value;
+
+        reader.skipSpace();
+        char ch = reader.get();
+        if (ch == '}') {
+            break;
+        } else if (ch != ',') {
+            throw std::runtime_error("Ожидаласб ',' или '}'");
+        }
+    }
+
+    return obj;
+}
+
 std::string parseString(JsonReader& reader) {
     std::string result;
     if (reader.get() != '"') {
@@ -129,7 +172,7 @@ namespace {
         char ch = reader.peek();
 
         if (ch == '{') {
-            // parseObject
+            return parseObject(reader);
         } else if (ch == '[') {
             //parseArray
         } else if (ch == '"') {
