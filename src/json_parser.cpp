@@ -72,6 +72,35 @@ JsonValue parseObject(JsonReader& reader) {
     return obj;
 }
 
+JsonArray parseArray(JsonReader& reader) {
+    JsonArray array;
+
+    if (reader.get() != '[') {
+        throw std::runtime_error("Ожидался символ '[' для начала массива");
+    }
+
+    reader.skipSpace();
+    if (reader.peek() == ']') {
+        reader.get(); // пустой массив
+        return array;
+    }
+
+    while (true) {
+        reader.skipSpace();
+        array.values.push_back(parseValue(reader));
+
+        reader.skipSpace();
+        char ch = reader.get();
+        if (ch == ']') {
+            break;
+        } else if (ch != ',') {
+            throw std::runtime_error("Ожидался ',' или ']' после элемента массива");
+        }
+    }
+
+    return array;
+    }
+
 std::string parseString(JsonReader& reader) {
     std::string result;
     if (reader.get() != '"') {
